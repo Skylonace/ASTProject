@@ -20,9 +20,9 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "docker pull mongo",
+	"postCreateCommand": "docker pull mongo && docker run -d -p 27017:27017 --name mongodb mongo",
 	
-	"postStartCommand": "docker run -d -p 27017:27017 --name mongodb mongo",
+	"postStartCommand": "docker start mongodb",
 
 	"customizations": {
 		// Configure properties specific to VS Code.
