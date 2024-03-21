@@ -20,7 +20,7 @@ async function applySchemaValidation(db: mongodb.Db) {
     const jsonSchema = {
         $jsonSchema: {
             bsonType: "object",
-            required: ["name", "prize", "stock"],
+            required: ["name", "price", "stock"],
             additionalProperties: false,
             properties: {
                 _id: {},
@@ -33,8 +33,8 @@ async function applySchemaValidation(db: mongodb.Db) {
                     description: "'price' is required and is a integer (cents)",
                 },
                 size: {
-                    bsonType: "int",
-                    description: "'size' is optional and is a integer",
+                    bsonType: "string",
+                    description: "'size' is optional and is a string",
                 },
                 color: {
                     bsonType: "string",

@@ -33,6 +33,7 @@ shoeRouter.get("/:id", async (req, res) => {
 shoeRouter.post("/", async (req, res) => {
     try {
         const shoe = req.body;
+        console.log(shoe);
         const result = await collections?.shoes?.insertOne(shoe);
 
         if (result?.acknowledged) {

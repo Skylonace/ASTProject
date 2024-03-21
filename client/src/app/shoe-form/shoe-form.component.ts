@@ -64,7 +64,6 @@ import { Shoe } from '../shoe';
           matInput
           placeholder="Talla"
           formControlName="size"
-          required
         />
         @if (size.invalid) {
         <mat-error>Talla no permitida.</mat-error>
@@ -77,7 +76,6 @@ import { Shoe } from '../shoe';
           matInput
           placeholder="Color"
           formControlName="color"
-          required
         />
         @if (color.invalid) {
         <mat-error>Color no permitido.</mat-error>
@@ -90,7 +88,6 @@ import { Shoe } from '../shoe';
           matInput
           placeholder="Marca"
           formControlName="brand"
-          required
         />
         @if (brand.invalid) {
         <mat-error>Marca no permitida.</mat-error>
@@ -133,11 +130,11 @@ export class ShoeFormComponent {
 
   shoeForm = this.formBuilder.group({
     name: ['', [Validators.required]],
-    price: [0, [Validators.required]],
-    size: [0, [Validators.required]],
-    color: ['', [Validators.required]],
-    brand: ['', [Validators.required]],
-    stock: [0, [Validators.required]],
+    price: [0, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?')]],
+    size: [''],
+    color: [''],
+    brand: [''],
+    stock: [0, [Validators.required, Validators.pattern('^[0-9]+')]],
   });
 
   constructor(private formBuilder: FormBuilder) {
@@ -145,7 +142,7 @@ export class ShoeFormComponent {
       this.shoeForm.setValue({
         name: this.initialState()?.name || '',
         price: this.initialState()?.price || 0,
-        size: this.initialState()?.size || 0,
+        size: this.initialState()?.size || '',
         color: this.initialState()?.color || '',
         brand: this.initialState()?.brand || '',
         stock: this.initialState()?.stock || 0,

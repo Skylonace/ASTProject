@@ -2,7 +2,7 @@ export interface Shoe {
     _id?: string;
     name: string;
     price: number;
-    size: number;
+    size: string;
     color: string;
     brand: string;
     stock: number;

@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-employees-list',
+  selector: 'app-shoes-list',
   standalone: true,
   imports: [RouterModule, MatTableModule, MatButtonModule, MatCardModule],
   styles: [
