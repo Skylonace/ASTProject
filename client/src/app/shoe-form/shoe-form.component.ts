@@ -13,7 +13,6 @@ import { Shoe } from '../shoe';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatRadioModule,
     MatButtonModule,
   ],
   styles: `
@@ -139,9 +138,10 @@ export class ShoeFormComponent {
 
   constructor(private formBuilder: FormBuilder) {
     effect(() => {
+      const price = (this.initialState()?.price || 0) / 100;
       this.shoeForm.setValue({
         name: this.initialState()?.name || '',
-        price: this.initialState()?.price || 0,
+        price: price || 0,
         size: this.initialState()?.size || '',
         color: this.initialState()?.color || '',
         brand: this.initialState()?.brand || '',

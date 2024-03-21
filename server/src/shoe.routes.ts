@@ -1,6 +1,7 @@
 import * as express from "express";
 import { ObjectId } from "mongodb";
 import { collections } from "./database";
+import { Shoe, parse_shoe} from "./shoe";
 
 export const shoeRouter = express.Router();
 shoeRouter.use(express.json());
@@ -14,7 +15,7 @@ shoeRouter.get("/", async (_req, res) => {
     }
 });
 
-shoeRouter.get("/:id", async (req, res) => {
+shoeRouter.get("/id/:id", async (req, res) => {
     try {
         const id = req?.params?.id;
         const query = { _id: new ObjectId(id) };
@@ -32,8 +33,11 @@ shoeRouter.get("/:id", async (req, res) => {
 
 shoeRouter.post("/", async (req, res) => {
     try {
-        const shoe = req.body;
-        console.log(shoe);
+        const shoe = parse_shoe(req?.body);
+        if(!shoe) {
+            res.status(400).send("Invalid shoe data.");
+            return;
+        }
         const result = await collections?.shoes?.insertOne(shoe);
 
         if (result?.acknowledged) {
@@ -47,7 +51,32 @@ shoeRouter.post("/", async (req, res) => {
     }
 });
 
-shoeRouter.delete("/:id", async (req, res) => {
+shoeRouter.put("/id/:id", async (req, res) => {
+    try {
+        const id = req?.params?.id;
+        const shoe = parse_shoe(req?.body);
+        if(!shoe) {
+            res.status(400).send("Invalid shoe data.");
+            return;
+        }
+        const query = { _id: new ObjectId(id) };
+        const result = await collections?.shoes?.updateOne(query, { $set: shoe });
+
+        if (result && result.matchedCount) {
+            res.status(200).send(`Updated a shoe: ID ${id}.`);
+        } else if (!result?.matchedCount) {
+            res.status(404).send(`Failed to find a shie: ID ${id}`);
+        } else {
+            res.status(304).send(`Failed to update a shoe: ID ${id}`);
+        }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        console.error(message);
+        res.status(400).send(message);
+    }
+});
+
+shoeRouter.delete("/id/:id", async (req, res) => {
     try {
         const id = req?.params?.id;
         const query = { _id: new ObjectId(id) };
@@ -64,5 +93,32 @@ shoeRouter.delete("/:id", async (req, res) => {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error(message);
         res.status(400).send(message);
+    }
+});
+
+shoeRouter.get("/search", async (req, res) => {
+    try {
+        if(!req?.query?.filterBy || !req?.query?.filter) {
+            res.status(400).send("Invalid search query.");
+            return;
+        }
+        var filter;
+        if(req?.query?.filterBy === "stock") {
+            
+            filter = parseInt(req?.query?.filter.toString());
+        }
+        else {
+            filter = req?.query?.filter.toString();
+        }
+        const filterBy = req?.query?.filterBy;
+        const query = { [filterBy.toString()]: filter };
+        const shoes = await collections?.shoes?.find(query).toArray();
+        if (shoes) {
+            res.status(200).send(shoes);
+        } else {
+            res.status(404).send(`Failed to find shoes: ${filterBy} ${filter}`);
+        }
+    } catch (error) {
+        res.status(500).send(error instanceof Error ? error.message : "Unknown error");
     }
 });

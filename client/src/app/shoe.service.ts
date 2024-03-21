@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Shoe } from './shoe';
 
 
@@ -26,7 +26,7 @@ export class ShoeService {
   }
 
   getShoe(id: string) {
-    this.httpClient.get<Shoe>(`${this.url}/shoes/${id}`).subscribe(Shoe => {
+    this.httpClient.get<Shoe>(`${this.url}/shoes/id/${id}`).subscribe(Shoe => {
       this.shoe$.set(Shoe);
       return this.shoe$();
     });
@@ -37,10 +37,18 @@ export class ShoeService {
   }
 
   updateShoe(id: string, Shoe: Shoe) {
-    return this.httpClient.put(`${this.url}/shoes/${id}`, Shoe, { responseType: 'text' });
+    return this.httpClient.put(`${this.url}/shoes/id/${id}`, Shoe, { responseType: 'text' });
   }
 
   deleteShoe(id: string) {
-    return this.httpClient.delete(`${this.url}/shoes/${id}`, { responseType: 'text' });
+    return this.httpClient.delete(`${this.url}/shoes/id/${id}`, { responseType: 'text' });
+  }
+
+  searchShoes(filter: any, filterBy: any) {
+    const params = new HttpParams().set('filter', filter).set('filterBy', filterBy);
+    this.httpClient.get<Shoe[]>(`${this.url}/shoes/search`, { params })
+      .subscribe(Shoes => {
+        this.shoes$.set(Shoes);
+      });
   }
 }

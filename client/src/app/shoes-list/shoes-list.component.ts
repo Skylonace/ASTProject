@@ -1,20 +1,23 @@
-import { Component, OnInit, WritableSignal } from '@angular/core';
+import { Component, OnInit, WritableSignal, effect, EventEmitter, input, Output } from '@angular/core';
 import { Shoe } from '../shoe';
 import { ShoeService } from '../shoe.service';
 import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-shoes-list',
   standalone: true,
-  imports: [RouterModule, MatTableModule, MatButtonModule, MatCardModule],
+  imports: [RouterModule, MatTableModule, MatButtonModule, MatCardModule, MatFormField, MatLabel, MatInputModule, MatSelect, MatOption, ReactiveFormsModule],
   styles: [
     `
       table {
         width: 100%;
-
         button:first-of-type {
           margin-right: 1rem;
         }
@@ -27,14 +30,50 @@ import { MatCardModule } from '@angular/material/card';
         <mat-card-title>Lista de zapatos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        <form
+          autocomplete="off"
+          [formGroup]="filterForm"
+          (submit)="filterShoes()"
+        >
+          <table>
+            <td><mat-form-field>
+              <mat-label>Filtar</mat-label>
+              <input matInput formControlName="filter" placeholder="Filtrar" required />
+            </mat-form-field></td>
+            <td><mat-form-field>
+              <mat-label>Filtrar por</mat-label>
+              <mat-select formControlName="filter-by" placeholder="Filtrar por" required>
+                <mat-option value="id">ID</mat-option>
+                <mat-option value="name">Nombre</mat-option>
+                <mat-option value="size">Talla</mat-option>
+                <mat-option value="color">Color</mat-option>
+                <mat-option value="brand">Marca</mat-option>
+                <mat-option value="stock">Stock</mat-option>
+              </mat-select>
+            </mat-form-field></td>
+            <td>
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="filterForm.invalid">
+                Filtrar
+              </button>
+            </td>
+          </table>
+        </form>
         <table mat-table [dataSource]="shoes$()">
+          <ng-container matColumnDef="col-id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let element">{{ element._id }}</td>
+          </ng-container>
           <ng-container matColumnDef="col-name">
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
             <td mat-cell *matCellDef="let element">{{ element.name }}</td>
           </ng-container>
           <ng-container matColumnDef="col-price">
             <th mat-header-cell *matHeaderCellDef>Precio</th>
-            <td mat-cell *matCellDef="let element">{{ element.price }}</td>
+            <td mat-cell *matCellDef="let element">{{ element.price/100 }}</td>
           </ng-container>
           <ng-container matColumnDef="col-size">
             <th mat-header-cell *matHeaderCellDef>Talla</th>
@@ -83,6 +122,7 @@ import { MatCardModule } from '@angular/material/card';
 export class ShoesListComponent implements OnInit {
   shoes$ = {} as WritableSignal<Shoe[]>;
   displayedColumns: string[] = [
+    'col-id',
     'col-name',
     'col-price',
     'col-size',
@@ -91,8 +131,14 @@ export class ShoesListComponent implements OnInit {
     'col-stock',
     'col-action',
   ];
+  
+  filterForm = this.formBuilder.group({
+    filter: ['', Validators.required],
+    'filter-by': ['id', Validators.required],
+  });
 
-  constructor(private shoesService: ShoeService) {}
+  constructor(private shoesService: ShoeService, private formBuilder: FormBuilder) {
+  }
 
   ngOnInit() {
     this.fetchShoes();
@@ -102,6 +148,10 @@ export class ShoesListComponent implements OnInit {
     this.shoesService.deleteShoe(id).subscribe({
       next: () => this.fetchShoes(),
     });
+  }
+
+  filterShoes(): void {
+    this.shoesService.searchShoes(this.filterForm.value.filter, this.filterForm.value['filter-by']);
   }
 
   private fetchShoes(): void {
