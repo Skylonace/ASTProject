@@ -43,7 +43,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
             <td><mat-form-field>
               <mat-label>Filtrar por</mat-label>
               <mat-select formControlName="filter-by" placeholder="Filtrar por" required>
-                <mat-option value="id">ID</mat-option>
+                <mat-option value="_id">ID</mat-option>
                 <mat-option value="name">Nombre</mat-option>
                 <mat-option value="size">Talla</mat-option>
                 <mat-option value="color">Color</mat-option>

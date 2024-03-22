@@ -20,7 +20,6 @@ shoeRouter.get("/id/:id", async (req, res) => {
         const id = req?.params?.id;
         const query = { _id: new ObjectId(id) };
         const shoe = await collections?.shoes?.findOne(query);
-
         if (shoe) {
             res.status(200).send(shoe);
         } else {
@@ -106,8 +105,9 @@ shoeRouter.get("/search", async (req, res) => {
         if(req?.query?.filterBy === "stock") {
             
             filter = parseInt(req?.query?.filter.toString());
-        }
-        else {
+        } else if(req?.query?.filterBy === "_id") {
+            filter = new ObjectId(req?.query?.filter.toString());
+        } else {
             filter = req?.query?.filter.toString();
         }
         const filterBy = req?.query?.filterBy;
